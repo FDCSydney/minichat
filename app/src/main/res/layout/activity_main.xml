@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/custom_toolbar"
+        layout="@layout/main_toolbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/incomingCallLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/custom_toolbar"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/incomingCallTitleTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/label_calling"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/acceptButton"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:backgroundTint="@color/light_green"
+            android:text="@string/label_accept"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toStartOf="@id/declineButton"
+            app:layout_constraintStart_toStartOf="@id/incomingCallTitleTv"
+            app:layout_constraintTop_toBottomOf="@id/incomingCallTitleTv" />
+
+        <Button
+            android:id="@+id/declineButton"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:backgroundTint="@color/red"
+            android:text="@string/label_decline"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/acceptButton"
+            app:layout_constraintTop_toBottomOf="@id/incomingCallTitleTv" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/userRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/incomingCallLayout"
+        tools:listitem="@layout/user" />
+    <FrameLayout
+        android:id="@+id/fragment_call_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
