@@ -14,8 +14,10 @@ import com.chat.minichat.webrtc.WebRTCClient;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
+import org.webrtc.RtpReceiver;
 import org.webrtc.SessionDescription;
 import org.webrtc.SurfaceViewRenderer;
+import org.webrtc.VideoTrack;
 
 public class MainRepository implements WebRTCClient.SocketTransferListener {
     private static MainRepository mInstance;
@@ -27,7 +29,7 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
     private WebRTCClient mWebRTCClient;
     private GsonManager mGsonManager;
 
-    private SurfaceViewRenderer mRemoveView;
+    private SurfaceViewRenderer mRemoteView;
 
     private MainRepository(Context context) {
         this.mFirebaseClient = new FirebaseClient();
@@ -76,6 +78,7 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
                     mWebRTCClient.addIceCandidateToPeer(iceCandidate);
                     break;
                 case "EndCall":
+                    mListener.onEndCall();
                     break;
                 default:
                     break;
@@ -102,10 +105,11 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         mWebRTCClient.setSocketTransferListener(this);
         mWebRTCClient.initializeWebRTCClient(username, new MyPeerObserver() {
             @Override
-            public void onAddStream(MediaStream var1) {
-                super.onAddStream(var1);
+            public void onAddTrack(RtpReceiver receiver, MediaStream[] mediaStreams) {
+                super.onAddTrack(receiver, mediaStreams);
                 try {
-                    var1.videoTracks.get(0).addSink(mRemoveView);
+                    VideoTrack remoteVideoTrack = mediaStreams[0].videoTracks.get(0);
+                    remoteVideoTrack.addSink(mRemoteView);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -137,9 +141,9 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         mWebRTCClient.initLocalSurfaceView(view, isVideoCall);
     }
 
-    public void initRemoveSurfaceView(SurfaceViewRenderer view) {
+    public void initRemoteSurfaceView(SurfaceViewRenderer view) {
         mWebRTCClient.initRemoteSurfaceView(view);
-        mRemoveView = view;
+        mRemoteView = view;
     }
 
     public void startCall() {
@@ -187,6 +191,7 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
 
     public interface Listener {
         void onLatestEventReceived(Chat chat);
+        void onEndCall();
     }
 
     public void setListener(Listener listener) {

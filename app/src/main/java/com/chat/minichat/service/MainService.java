@@ -84,7 +84,7 @@ public class MainService extends Service implements MainRepository.Listener {
         mMainRepository.setUser(target, username);
         // initialize widget
         mMainRepository.initLocalSurfaceView(mLocalView, isVideoCall);
-        mMainRepository.initRemoveSurfaceView(mRemoteView);
+        mMainRepository.initRemoteSurfaceView(mRemoteView);
         // prepare for call
         if (!isCaller) {
             mMainRepository.startCall();
@@ -115,6 +115,11 @@ public class MainService extends Service implements MainRepository.Listener {
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onEndCall() {
+
     }
 
     public interface CallReceivedListener {

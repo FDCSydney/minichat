@@ -51,8 +51,8 @@ public class WebRTCClient {
     private final VideoSource videoSource;
     private SurfaceTextureHelper mSurfaceTextureHelper;
 
-    private CameraVideoCapturer mVideoCapturer;
-    private MediaConstraints mMediaConstraints;
+    private final CameraVideoCapturer mVideoCapturer;
+    private final MediaConstraints mMediaConstraints;
 
     private WebRTCClient(Context context) {
         mContext = context;
@@ -199,6 +199,7 @@ public class WebRTCClient {
 
     // streaming
     private void initSurfaceView(SurfaceViewRenderer renderer) {
+        if(renderer == null) return;
         renderer.setMirror(false);
         renderer.setEnableHardwareScaler(true);
         renderer.init(eglBaseCtx, null);
@@ -217,12 +218,12 @@ public class WebRTCClient {
 
     private void startLocalStreaming(SurfaceViewRenderer localView, Boolean isVideoCall) {
         mLocalStream = mPeerConnectionFactory.createLocalMediaStream(localStreamId);
+        mLocalAudioTrack = mPeerConnectionFactory.createAudioTrack(localTrackId + "_audio", audioSrc);
+        mLocalStream.addTrack(mLocalAudioTrack);
         if (isVideoCall) {
             startCapturingCamera(localView);
         }
-        mLocalAudioTrack = mPeerConnectionFactory.createAudioTrack(localTrackId + "_audio", audioSrc);
-        mLocalStream.addTrack(mLocalAudioTrack);
-        mPeerConnection.addStream(mLocalStream);
+        mPeerConnection.addTrack(mLocalAudioTrack);
     }
 
     private void startCapturingCamera(SurfaceViewRenderer localView) {
@@ -232,8 +233,7 @@ public class WebRTCClient {
         mLocalVideoTrack = mPeerConnectionFactory.createVideoTrack(localTrackId + "_video", videoSource);
         mLocalVideoTrack.addSink(localView);
         mLocalStream.addTrack(mLocalVideoTrack);
-
-
+        mPeerConnection.addTrack(mLocalVideoTrack);
     }
 
     private void stopCapturingCamera() {
