@@ -12,7 +12,19 @@ public class Chat {
     private Boolean isValid;
     private ChatType type;
 
-    public Chat(String sender,ChatType type, String target) {
+    public Chat(String target, ChatType type) {
+        this.target = target;
+        this.type = type;
+    }
+
+    public Chat(String sender, String target, String data, ChatType type) {
+        this.sender = sender;
+        this.target = target;
+        this.data = data;
+        this.type = type;
+    }
+
+    public Chat(String sender, ChatType type, String target) {
         this.sender = sender;
         this.type = type;
         this.target = target;

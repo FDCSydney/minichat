@@ -53,8 +53,7 @@
                 android:textSize="15sp"
                 android:textColor="@color/white"
                 android:padding="10dp"
-                android:id="@+id/callTitleTv"
-                android:text="Call with Darna"/>
+                android:id="@+id/callTitleTv"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

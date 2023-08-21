@@ -8,7 +8,7 @@
     <string name="label_login">Log in</string>
     <string name="label_log_out">Log Out</string>
     <string name="label_accept">Accept</string>
-    <string name="label_decline">Decline</string>
+    <string name="label_decline">Reject</string>
     <string name="label_calling">is calling you</string>
     <string name="label_add">Add</string>
     <!-- TODO: Remove or change this placeholder text -->

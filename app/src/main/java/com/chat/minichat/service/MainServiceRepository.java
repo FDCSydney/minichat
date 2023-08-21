@@ -2,7 +2,6 @@ package com.chat.minichat.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 public class MainServiceRepository {
     private final Context mContext;
@@ -20,5 +19,14 @@ public class MainServiceRepository {
 
     public void startServiceIntent(Intent intent) {
         mContext.startForegroundService(intent);
+    }
+
+    public void setUpViews(String target, Boolean isVideoCall, Boolean isCaller) {
+        Intent intent = new Intent(mContext, MainService.class);
+        intent.setAction(MainServiceAction.SETUP_VIEWS.getName());
+        intent.putExtra("isVideoCall", isVideoCall);
+        intent.putExtra("target", target);
+        intent.putExtra("isCaller", isCaller);
+        startServiceIntent(intent);
     }
 }

@@ -14,14 +14,21 @@ import com.chat.minichat.R;
 import com.chat.minichat.models.Chat;
 import com.chat.minichat.repository.MainRepository;
 
+import org.webrtc.SurfaceViewRenderer;
+
 public class MainService extends Service implements MainRepository.Listener {
     private static final String TAG = "MainService";
     private Boolean isServiceRunning = false;
     private String username = null;
     private NotificationManager mNotificationManager;
-    private final MainRepository mMainRepository = new MainRepository();
+    private final MainRepository mMainRepository;
+    private static CallReceivedListener mCallReceivedListener;
+    public static SurfaceViewRenderer mLocalView;
+    public static SurfaceViewRenderer mRemoteView;
 
-    private Listener mListener;
+    public MainService() {
+        mMainRepository = MainRepository.getInstance(this);
+    }
 
     @Override
     public void onCreate() {
@@ -35,6 +42,9 @@ public class MainService extends Service implements MainRepository.Listener {
             switch (intent.getAction()) {
                 case "START_SERVICE":
                     handleStartService(intent);
+                    break;
+                case "SETUP_VIEWS":
+                    handleSetupViews(intent);
                     break;
                 default:
                     break;
@@ -63,6 +73,23 @@ public class MainService extends Service implements MainRepository.Listener {
         // set up clients
         mMainRepository.setListener(this);
         mMainRepository.initFirebase(username);
+        mMainRepository.initWebRTCClient(username);
+
+    }
+
+    private void handleSetupViews(Intent intent) {
+        String target = intent.getStringExtra("target");
+        boolean isCaller = intent.getBooleanExtra("isCaller", true);
+        Boolean isVideoCall = intent.getBooleanExtra("isVideoCall", true);
+        mMainRepository.setUser(target, username);
+        // initialize widget
+        mMainRepository.initLocalSurfaceView(mLocalView, isVideoCall);
+        mMainRepository.initRemoveSurfaceView(mRemoteView);
+        // prepare for call
+        if (!isCaller) {
+            mMainRepository.startCall();
+        }
+
 
     }
 
@@ -82,19 +109,20 @@ public class MainService extends Service implements MainRepository.Listener {
         switch (chat.getType().toString()) {
             case "StartAudioCall":
             case "StartVideoCall":
-                mListener.onCallReceived(chat);
+                if (mCallReceivedListener != null)
+                    mCallReceivedListener.onCallReceived(chat);
                 break;
             default:
                 break;
         }
     }
 
-    public interface Listener {
+    public interface CallReceivedListener {
         void onCallReceived(Chat chat);
     }
 
-    public void onSetListener(Listener listener) {
-        mListener = listener;
+    public static void setCallReceivedListener(CallReceivedListener listener) {
+        mCallReceivedListener = listener;
     }
 
 }

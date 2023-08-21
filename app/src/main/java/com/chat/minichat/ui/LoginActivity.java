@@ -24,7 +24,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         View view = mBinding.getRoot();
         setContentView(view);
 
-        mRepository = new MainRepository();
+        mRepository = MainRepository.getInstance(this);
         mBinding.btnLogin.setOnClickListener(this);
     }
 

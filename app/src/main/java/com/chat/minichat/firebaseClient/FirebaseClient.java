@@ -118,7 +118,6 @@ public class FirebaseClient {
                             Chat chat = null;
                             try {
                                 chat = mGsonManager.getGson().fromJson(snapshot.getValue().toString(), Chat.class);
-                                chat.setSender(username);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -132,7 +131,15 @@ public class FirebaseClient {
         }
     }
 
+    public void updateMyStatus(String username, UserStatus status) {
+        DatabaseReference dbRef = this.mFirebaseDbManager.getReference();
+        dbRef.child(username).child(Constants.FirebaseField.STATUS).setValue(status.name());
+    }
 
+    public void removeLatestEvent(String username) {
+        DatabaseReference dbRef = this.mFirebaseDbManager.getReference();
+        dbRef.child(username).child(Constants.FirebaseField.LATEST_EVENT).setValue(null);
+    }
 
 
     public interface Listener {

@@ -30,7 +30,7 @@
         </activity>
         <activity
             android:name=".ui.MainActivity"
-            android:exported="false" />
+            android:exported="true" />
         <service android:name=".service.MainService"/>
 
     </application>
