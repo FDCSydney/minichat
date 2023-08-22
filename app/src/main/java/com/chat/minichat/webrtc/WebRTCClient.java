@@ -223,7 +223,7 @@ public class WebRTCClient {
         if (isVideoCall) {
             startCapturingCamera(localView);
         }
-        mPeerConnection.addTrack(mLocalAudioTrack);
+        mPeerConnection.addStream(mLocalStream);
     }
 
     private void startCapturingCamera(SurfaceViewRenderer localView) {
@@ -233,7 +233,6 @@ public class WebRTCClient {
         mLocalVideoTrack = mPeerConnectionFactory.createVideoTrack(localTrackId + "_video", videoSource);
         mLocalVideoTrack.addSink(localView);
         mLocalStream.addTrack(mLocalVideoTrack);
-        mPeerConnection.addTrack(mLocalVideoTrack);
     }
 
     private void stopCapturingCamera() {

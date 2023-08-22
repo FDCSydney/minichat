@@ -4,6 +4,7 @@ import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
+import org.webrtc.RtpReceiver;
 
 public class MyPeerObserver implements PeerConnection.Observer {
     /**
@@ -83,6 +84,15 @@ public class MyPeerObserver implements PeerConnection.Observer {
      */
     @Override
     public void onRenegotiationNeeded() {
+
+    }
+
+    /**
+     * @param rtpReceiver
+     * @param mediaStreams
+     */
+    @Override
+    public void onAddTrack(RtpReceiver rtpReceiver, MediaStream[] mediaStreams) {
 
     }
 }

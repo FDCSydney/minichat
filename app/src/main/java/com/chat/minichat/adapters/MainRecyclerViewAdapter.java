@@ -53,7 +53,7 @@ public class MainRecyclerViewAdapter extends Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         User user = mUsers.get(position);
         mViewHolder = (MainRecyclerViewHolder) holder;
-        mViewHolder.setValue(user);
+        if(user != null) mViewHolder.setValue(user);
     }
 
     /**
@@ -79,7 +79,8 @@ public class MainRecyclerViewAdapter extends Adapter {
                     .placeholder(R.mipmap.pp_placeholder)
                     .fitCenter()
                     .into(mUserBinding.pp);
-            mUserBinding.username.setText(user.getName());
+            String name = user.getName();
+            mUserBinding.username.setText(name != null ? name: "");
             switch (user.getStatus()) {
                 case "ONLINE":
                     mUserBinding.status.setBackgroundColor(Color.parseColor("#00cc00"));

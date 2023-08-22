@@ -6,8 +6,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT"
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission
+        android:name="android.permission.CAPTURE_VIDEO_OUTPUT"
         tools:ignore="ProtectedPermissions" />
 
     <application
@@ -20,6 +21,9 @@
         android:theme="@style/Theme.MiniChat"
         tools:targetApi="31">
         <activity
+            android:name=".ui.CloseActivity"
+            android:exported="true" />
+        <activity
             android:name=".ui.LoginActivity"
             android:exported="true">
             <intent-filter>
@@ -31,8 +35,9 @@
         <activity
             android:name=".ui.MainActivity"
             android:exported="true" />
-        <service android:name=".service.MainService"/>
 
+        <receiver android:name=".service.MainServiceReceiver" />
+        <service android:name=".service.MainService" />
     </application>
 
 </manifest>

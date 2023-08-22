@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 
 public class BaseActivity extends AppCompatActivity {
     public static final int PERMISSION_REQUEST_CODE = 123; // Use any unique code
+    public static final int PERMISSION_CALL_CODE = 12; // Use any unique code
 
     public boolean checkPermissions() {
         int cameraPermission = checkSelfPermission(android.Manifest.permission.CAMERA);
@@ -20,6 +21,13 @@ public class BaseActivity extends AppCompatActivity {
                 this,
                 new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO},
                 PERMISSION_REQUEST_CODE
+        );
+    }
+    public void requestReceiverPermissions() {
+        ActivityCompat.requestPermissions(
+                this,
+                new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO},
+                PERMISSION_CALL_CODE
         );
     }
 

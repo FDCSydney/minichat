@@ -14,10 +14,8 @@ import com.chat.minichat.webrtc.WebRTCClient;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
-import org.webrtc.RtpReceiver;
 import org.webrtc.SessionDescription;
 import org.webrtc.SurfaceViewRenderer;
-import org.webrtc.VideoTrack;
 
 public class MainRepository implements WebRTCClient.SocketTransferListener {
     private static MainRepository mInstance;
@@ -64,17 +62,15 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
                 case "Answer":
                     mWebRTCClient.onRemoteSessionReceived(new SessionDescription(SessionDescription.Type.ANSWER,
                             chat.getData()));
-                    mWebRTCClient.answer(mTarget);
                     break;
                 case "IceCandidate":
                     IceCandidate iceCandidate = null;
-
-                    try{
+                    try {
                         iceCandidate = mGsonManager.getGson().fromJson(chat.getData(), IceCandidate.class);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    if(iceCandidate == null) return;
+                    if (iceCandidate == null) return;
                     mWebRTCClient.addIceCandidateToPeer(iceCandidate);
                     break;
                 case "EndCall":
@@ -102,14 +98,13 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
 
 
     public void initWebRTCClient(String username) {
-        mWebRTCClient.setSocketTransferListener(this);
         mWebRTCClient.initializeWebRTCClient(username, new MyPeerObserver() {
             @Override
-            public void onAddTrack(RtpReceiver receiver, MediaStream[] mediaStreams) {
-                super.onAddTrack(receiver, mediaStreams);
+            public void onAddStream(MediaStream var1) {
+                super.onAddStream(var1);
                 try {
-                    VideoTrack remoteVideoTrack = mediaStreams[0].videoTracks.get(0);
-                    remoteVideoTrack.addSink(mRemoteView);
+                    if (var1 == null) return;
+                    var1.videoTracks.get(0).addSink(mRemoteView);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -135,6 +130,8 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
                 }
             }
         });
+        mWebRTCClient.setSocketTransferListener(this);
+
     }
 
     public void initLocalSurfaceView(SurfaceViewRenderer view, Boolean isVideoCall) {
@@ -189,8 +186,13 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         });
     }
 
+    public void logOff(Callback.StopServiceCallback stopServiceCallback) {
+        mFirebaseClient.logOff(stopServiceCallback);
+    }
+
     public interface Listener {
         void onLatestEventReceived(Chat chat);
+
         void onEndCall();
     }
 

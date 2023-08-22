@@ -10,6 +10,7 @@ import com.chat.minichat.models.Chat;
 import com.chat.minichat.models.User;
 import com.chat.minichat.utils.Constants;
 import com.chat.minichat.utils.MyEventListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
@@ -117,7 +118,7 @@ public class FirebaseClient {
                             super.onDataChange(snapshot);
                             Chat chat = null;
                             try {
-                                chat = mGsonManager.getGson().fromJson(snapshot.getValue().toString(), Chat.class);
+                                chat = mGsonManager.getGson().fromJson(Objects.requireNonNull(snapshot.getValue()).toString(), Chat.class);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -139,6 +140,14 @@ public class FirebaseClient {
     public void removeLatestEvent(String username) {
         DatabaseReference dbRef = this.mFirebaseDbManager.getReference();
         dbRef.child(username).child(Constants.FirebaseField.LATEST_EVENT).setValue(null);
+    }
+
+    public void logOff(Callback.StopServiceCallback stopServiceCallback) {
+        DatabaseReference dbRef = this.mFirebaseDbManager.getReference();
+        dbRef.child(username).child(Constants.FirebaseField.STATUS).setValue(UserStatus.OFFLINE)
+                .addOnSuccessListener(res -> {
+                    stopServiceCallback.onSuccess(true);
+                });
     }
 
 

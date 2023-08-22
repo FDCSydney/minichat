@@ -6,11 +6,14 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.chat.minichat.R;
+import com.chat.minichat.interfaces.Callback;
+import com.chat.minichat.managers.RTCAudioManager;
 import com.chat.minichat.models.Chat;
 import com.chat.minichat.repository.MainRepository;
 
@@ -21,21 +24,26 @@ public class MainService extends Service implements MainRepository.Listener {
     private Boolean isServiceRunning = false;
     private String username = null;
     private NotificationManager mNotificationManager;
-    private final MainRepository mMainRepository;
+    private MainRepository mMainRepository;
+    private RTCAudioManager mRtcAudioManager;
     private static CallReceivedListener mCallReceivedListener;
+    private static CallEndedListener mCallEndedListener;
     public static SurfaceViewRenderer mLocalView;
     public static SurfaceViewRenderer mRemoteView;
 
-    public MainService() {
+    public MainService(){
         mMainRepository = MainRepository.getInstance(this);
+
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         mNotificationManager = getSystemService(NotificationManager.class);
-    }
+        mRtcAudioManager = RTCAudioManager.create(this);
+        mRtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE);
 
+    }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
@@ -46,11 +54,80 @@ public class MainService extends Service implements MainRepository.Listener {
                 case "SETUP_VIEWS":
                     handleSetupViews(intent);
                     break;
+                case "END_CALL":
+                    handleEndCall(intent);
+                case "SWITCH_CAMERA":
+                    handleSwitchCamera();
+                    break;
+                case "TOGGLE_AUDIO":
+                    handleToggleAudio(intent);
+                    break;
+                case "TOGGLE_CAMERA":
+                    handleToggleCamera(intent);
+                    break;
+                case "TOGGLE_AUDIO_DEVICE":
+                    handleToggleAudioDevice(intent);
+                    break;
+                    case "STOP_SERVICE":
+                        handleStopService(intent);
+                        break;
                 default:
                     break;
             }
         }
         return START_STICKY;
+    }
+
+    private void handleStopService(Intent intent) {
+        mMainRepository.endCall();
+        mMainRepository.logOff((Callback.StopServiceCallback) status -> {
+            isServiceRunning = false;
+            stopSelf();
+        });
+    }
+
+    private void handleToggleAudioDevice(Intent intent) {
+        String type = intent.getStringExtra("type");
+        RTCAudioManager.AudioDevice device;
+        if (type.equals(RTCAudioManager.AudioDevice.EARPIECE.name())) {
+            device = RTCAudioManager.AudioDevice.EARPIECE;
+        } else if (type.equals(RTCAudioManager.AudioDevice.SPEAKER_PHONE.name())) {
+            device = RTCAudioManager.AudioDevice.SPEAKER_PHONE;
+        } else {
+            device = null;
+        }
+        if (device == null) return;
+        mRtcAudioManager.setDefaultAudioDevice(device);
+        mRtcAudioManager.selectAudioDevice(device);
+        Log.d(TAG, "handleToggleAudioDevice: " + device);
+    }
+
+    private void handleToggleCamera(Intent intent) {
+        boolean isCameraMuted = intent.getBooleanExtra("shouldBeMuted", false);
+        mMainRepository.toggleVideo(isCameraMuted);
+    }
+
+    private void handleToggleAudio(Intent intent) {
+        boolean isAudioMuted = intent.getBooleanExtra("shouldBeMuted", false);
+        mMainRepository.toggleAudio(isAudioMuted);
+    }
+
+    private void handleSwitchCamera() {
+        mMainRepository.switchCamera();
+    }
+
+    private void handleEndCall(Intent intent) {
+        // send signal to peer to end call
+        mMainRepository.sendEndCall();
+        // restartWebRtcRepo
+        endCallAndRestartRepo();
+
+    }
+
+    private void endCallAndRestartRepo() {
+        mMainRepository.endCall();
+        mCallEndedListener.onCallEnded();
+        mMainRepository.initWebRTCClient(username);
     }
 
     /**
@@ -79,7 +156,7 @@ public class MainService extends Service implements MainRepository.Listener {
 
     private void handleSetupViews(Intent intent) {
         String target = intent.getStringExtra("target");
-        boolean isCaller = intent.getBooleanExtra("isCaller", true);
+        boolean isCaller = intent.getBooleanExtra("isCaller", false);
         Boolean isVideoCall = intent.getBooleanExtra("isVideoCall", true);
         mMainRepository.setUser(target, username);
         // initialize widget
@@ -119,15 +196,23 @@ public class MainService extends Service implements MainRepository.Listener {
 
     @Override
     public void onEndCall() {
-
+        endCallAndRestartRepo();
     }
 
     public interface CallReceivedListener {
         void onCallReceived(Chat chat);
     }
 
+    public interface CallEndedListener {
+        void onCallEnded();
+    }
+
     public static void setCallReceivedListener(CallReceivedListener listener) {
         mCallReceivedListener = listener;
+    }
+
+    public static void setCallEndedListener(CallEndedListener listener) {
+        mCallEndedListener = listener;
     }
 
 }

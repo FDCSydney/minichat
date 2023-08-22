@@ -20,4 +20,8 @@ public class Callback {
     public interface ChatConnectionRequestCallback{
         void isSuccess(Boolean isSuccess);
     }
+
+    public interface StopServiceCallback{
+        void onSuccess(Boolean status);
+    }
 }
