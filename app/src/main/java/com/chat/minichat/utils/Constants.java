@@ -6,6 +6,7 @@ public class Constants {
         public static String PASSWORD = "password";
         public static String STATUS = "status";
         public static String LATEST_EVENT = "latest_event";
+        public static String ROOM_ID = "room_id";
     }
 
     public static class Error{

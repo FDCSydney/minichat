@@ -1,7 +1,8 @@
-package com.chat.minichat.fragments;
+package com.chat.minichat.ui.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,16 +24,15 @@ import com.chat.minichat.service.MainServiceRepository;
  */
 public class CallFragment extends Fragment implements MainService.CallEndedListener {
     private FragmentCallBinding mBinding;
-    private String mTarget;
-    private Boolean mIsCaller = true;
-    private Boolean mIsVideoCall = true;
 
     private boolean isMicrophoneMuted;
     private boolean isCameraMuted;
     private boolean isSilentMode;
-    public  BackPressListener mBackPressListener;
-
+    public BackPressListener mBackPressListener;
+    public Handler mHandler;
+    public Runnable timerRunnable;
     private MainServiceRepository mMainServiceRepository;
+    public int timerValue = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -40,6 +40,7 @@ public class CallFragment extends Fragment implements MainService.CallEndedListe
         // Inflate the layout for this fragment
         mBinding = FragmentCallBinding.inflate(inflater, container, false);
         mMainServiceRepository = new MainServiceRepository(getContext());
+        mHandler = new Handler();
         return mBinding.getRoot();
     }
 
@@ -52,11 +53,22 @@ public class CallFragment extends Fragment implements MainService.CallEndedListe
     @SuppressLint("SetTextI18n")
     private void init() {
         MainService.setCallEndedListener(this);
+        // timer
+        timerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                timerValue++;
+                mBinding.callTimerTv.setText(convertToHumanTime(timerValue));
+                mHandler.postDelayed(this, 1000);
+            }
+        };
+        mHandler.post(timerRunnable);
+
         Bundle bundle = getArguments();
         assert bundle != null;
-        mTarget = bundle.getString("target");
-        mIsVideoCall = bundle.getBoolean("isVideoCall");
-        mIsCaller = bundle.getBoolean("isCaller");
+        String mTarget = bundle.getString("target");
+        Boolean mIsVideoCall = bundle.getBoolean("isVideoCall");
+        Boolean mIsCaller = bundle.getBoolean("isCaller");
         mBinding.callTitleTv.setText("Call with " + mTarget);
         if (!mIsVideoCall) {
             mBinding.screenShareButton.setVisibility(View.GONE);
@@ -76,6 +88,12 @@ public class CallFragment extends Fragment implements MainService.CallEndedListe
         setUpToggleCamera();
         setUpToggleMicrophone();
         setUpToggleAudioDevice();
+    }
+
+    private String convertToHumanTime(int seconds) {
+        int minutes = seconds / 60;
+        seconds %= 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     private void setUpToggleCamera() {
@@ -142,7 +160,7 @@ public class CallFragment extends Fragment implements MainService.CallEndedListe
         void onFragmentBackPressed();
     }
 
-    public  void setBackPressedListener(BackPressListener listener) {
+    public void setBackPressedListener(BackPressListener listener) {
         mBackPressListener = listener;
     }
 }

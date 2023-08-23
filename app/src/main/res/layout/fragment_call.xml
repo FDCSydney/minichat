@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:id="@+id/call_fragment"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.CallFragment">
+    tools:context=".ui.fragments.CallFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -99,6 +99,7 @@
             <androidx.appcompat.widget.AppCompatImageButton
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:visibility="gone"
                 android:id="@+id/screenShareButton"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_screen_share"/>

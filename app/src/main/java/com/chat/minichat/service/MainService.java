@@ -69,7 +69,7 @@ public class MainService extends Service implements MainRepository.Listener {
                     handleToggleAudioDevice(intent);
                     break;
                     case "STOP_SERVICE":
-                        handleStopService(intent);
+                        handleStopService();
                         break;
                 default:
                     break;
@@ -78,9 +78,9 @@ public class MainService extends Service implements MainRepository.Listener {
         return START_STICKY;
     }
 
-    private void handleStopService(Intent intent) {
+    private void handleStopService() {
         mMainRepository.endCall();
-        mMainRepository.logOff((Callback.StopServiceCallback) status -> {
+        mMainRepository.logOff(() -> {
             isServiceRunning = false;
             stopSelf();
         });
@@ -151,6 +151,7 @@ public class MainService extends Service implements MainRepository.Listener {
         mMainRepository.setListener(this);
         mMainRepository.initFirebase(username);
         mMainRepository.initWebRTCClient(username);
+        mMainRepository.setUser(username);
 
     }
 

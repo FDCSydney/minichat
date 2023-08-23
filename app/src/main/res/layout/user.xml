@@ -63,8 +63,19 @@
             android:layout_marginEnd="20dp"
             android:src="@drawable/n_call"
             android:layout_toStartOf="@id/v_call"
-
             tools:ignore="ContentDescription" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/join_room"
+            android:layout_width="60dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/a_call"
+            android:visibility="invisible"
+            android:text="JOIN"
+            android:textSize="10sp"
+            android:layout_marginEnd="10dp"
+            android:layout_height="32dp"
+            android:textColor="@color/white"
+            android:background="@drawable/room_join"/>
 
         <ImageView
             android:id="@+id/v_call"

@@ -25,7 +25,7 @@ public class RequestManager {
         return mInstance;
     }
 
-    RequestQueue getRequestQueue() {
+    public RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(mContext);
         }

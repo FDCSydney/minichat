@@ -1,9 +1,11 @@
 package com.chat.minichat.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,19 +16,28 @@ import com.bumptech.glide.Glide;
 import com.chat.minichat.R;
 import com.chat.minichat.adapters.MainRecyclerViewAdapter;
 import com.chat.minichat.databinding.ActivityMainBinding;
-import com.chat.minichat.enums.ChatType;
-import com.chat.minichat.fragments.CallFragment;
 import com.chat.minichat.models.Chat;
 import com.chat.minichat.models.User;
 import com.chat.minichat.repository.MainRepository;
 import com.chat.minichat.service.MainService;
+import com.chat.minichat.service.MainServiceReceiver;
 import com.chat.minichat.service.MainServiceRepository;
+import com.chat.minichat.ui.fragments.CallFragment;
+import com.chat.minichat.utils.enums.ChatType;
 
+import org.jitsi.meet.sdk.JitsiMeet;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetActivityDelegate;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class MainActivity extends BaseActivity implements MainService.CallReceivedListener, CallFragment.BackPressListener {
+public class MainActivity extends BaseActivity implements MainService.CallReceivedListener,
+        CallFragment.BackPressListener {
     private static final String TAG = "MainActivity";
     private ActivityMainBinding mBinding;
     private MainRepository mRepository;
@@ -71,7 +82,19 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
                 .into(mBinding.customToolbar.currentUserPp);
         mBinding.customToolbar.currentUserStatus.setBackgroundColor(Color.parseColor("#00cc00"));
         mBinding.customToolbar.createRoom.setOnClickListener(view -> {
-            Toast.makeText(this, "Will Create Room!", Toast.LENGTH_SHORT).show();
+            String secretKey = System.currentTimeMillis() + username;
+            mRepository.createRoom(username, secretKey, status -> {
+                if (!status) return;
+                Toast.makeText(this, "Room Created!", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(() -> {
+                    joinRoom(secretKey);
+                }, 2000);
+            });
+        });
+        mBinding.customToolbar.currentUserPp.setOnClickListener(view -> {
+            Intent intent = new Intent(this, MainServiceReceiver.class);
+            intent.setAction("ACTION_EXIT");
+            this.sendBroadcast(intent);
         });
         subScribeObservers();
         startService();
@@ -82,6 +105,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         mBinding.userRecyclerView.setHasFixedSize(true);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void subScribeObservers() {
         MainService.setCallReceivedListener(this);
         mRepository.observeUsersStatus(users -> {
@@ -89,7 +113,6 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
                     .collect(Collectors.toList());
             mAdapter = new MainRecyclerViewAdapter(this, filteredUser);
             mBinding.userRecyclerView.setAdapter(mAdapter);
-//            TODO: implement specific notifier
             mAdapter.notifyDataSetChanged();
             mAdapter.setOnClickListener(new MainRecyclerViewAdapter.ClickListener() {
                 @Override
@@ -117,6 +140,14 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
                         requestPermissions();
                     }
                 }
+
+                /**
+                 * @param user
+                 */
+                @Override
+                public void onJoinRoomClicked(User user) {
+                    joinRoom(user.getRoomId());
+                }
             });
 
         });
@@ -124,7 +155,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
     }
 
     private void startService() {
-        new MainServiceRepository(this).startService(username);
+        mMainServiceRepository.startService(username);
     }
 
     @Override
@@ -193,23 +224,48 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
             });
             mBinding.declineButton.setOnClickListener(view -> {
                 mBinding.incomingCallLayout.setVisibility(View.GONE);
+                mRepository.clearLatestEvent(username);
             });
         });
     }
+
+
+    // connect to room with jitsi
+    public void joinRoom(String secretKey) {
+        JitsiMeetConferenceOptions defaultOptions;
+        try {
+            defaultOptions = new JitsiMeetConferenceOptions.Builder()
+                    .setServerURL(new URL("https://meet.jit.si"))
+                    .build();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
+        JitsiMeetConferenceOptions options
+                = new JitsiMeetConferenceOptions.Builder()
+                .setRoom(secretKey)
+                .build();
+        JitsiMeetActivity.launch(this, options);
+
+    }
+
+
 
     /**
      *
      */
     @Override
     public void onFragmentBackPressed() {
-        Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
+        getSupportFragmentManager().beginTransaction().remove(mCallFragment).commit();
+        mCallFragment.timerValue = 0;
         mMainServiceRepository.sendEndCall();
     }
 
     @Override
     public void onBackPressed() {
-        if (mCallFragment != null && mCallFragment.mBackPressListener != null) {
+        if (mCallFragment != null && mCallFragment.mBackPressListener != null && mCallFragment.isVisible()) {
             mCallFragment.mBackPressListener.onFragmentBackPressed();
+            mCallFragment.mHandler.removeCallbacks(mCallFragment.timerRunnable);
         } else {
             super.onBackPressed();
             mMainServiceRepository.stopService();

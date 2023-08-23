@@ -3,6 +3,7 @@ package com.chat.minichat.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -53,7 +54,7 @@ public class MainRecyclerViewAdapter extends Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         User user = mUsers.get(position);
         mViewHolder = (MainRecyclerViewHolder) holder;
-        if(user != null) mViewHolder.setValue(user);
+        if (user != null) mViewHolder.setValue(user);
     }
 
     /**
@@ -80,7 +81,10 @@ public class MainRecyclerViewAdapter extends Adapter {
                     .fitCenter()
                     .into(mUserBinding.pp);
             String name = user.getName();
-            mUserBinding.username.setText(name != null ? name: "");
+            mUserBinding.username.setText(name != null ? name : "");
+            if (user.getRoomId() != null) {
+                mUserBinding.joinRoom.setVisibility(View.VISIBLE);
+            }
             switch (user.getStatus()) {
                 case "ONLINE":
                     mUserBinding.status.setBackgroundColor(Color.parseColor("#00cc00"));
@@ -92,12 +96,16 @@ public class MainRecyclerViewAdapter extends Adapter {
                     mUserBinding.status.setBackgroundColor(Color.parseColor("#a80510"));
                     break;
             }
+
             mUserBinding.aCall.setOnClickListener(view -> {
                 mCallback.onAudioCallClicked(user);
             });
 
             mUserBinding.vCall.setOnClickListener(view -> {
                 mCallback.onVideoCallClicked(user);
+            });
+            mUserBinding.joinRoom.setOnClickListener(view -> {
+                mCallback.onJoinRoomClicked(user);
             });
         }
     }
@@ -106,6 +114,8 @@ public class MainRecyclerViewAdapter extends Adapter {
         void onAudioCallClicked(User user);
 
         void onVideoCallClicked(User user);
+
+        void onJoinRoomClicked(User user);
     }
 
     public void setOnClickListener(ClickListener callback) {

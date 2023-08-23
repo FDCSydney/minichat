@@ -37,6 +37,7 @@
             android:exported="true" />
 
         <receiver android:name=".service.MainServiceReceiver" />
+
         <service android:name=".service.MainService" />
     </application>
 

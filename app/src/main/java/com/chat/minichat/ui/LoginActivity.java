@@ -44,6 +44,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
                 return;
             }
+            mBinding.usernameLayout.getEditText().setText("");
+            mBinding.passwordLayout.getEditText().setText("");
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra("username", username);
             startActivity(intent);

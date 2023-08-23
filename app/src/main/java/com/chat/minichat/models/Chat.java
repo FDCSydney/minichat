@@ -1,7 +1,7 @@
 package com.chat.minichat.models;
 
 
-import com.chat.minichat.enums.ChatType;
+import com.chat.minichat.utils.enums.ChatType;
 
 public class Chat {
     private String sender;

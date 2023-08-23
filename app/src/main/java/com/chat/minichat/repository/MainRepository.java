@@ -2,8 +2,8 @@ package com.chat.minichat.repository;
 
 import android.content.Context;
 
-import com.chat.minichat.enums.ChatType;
-import com.chat.minichat.enums.UserStatus;
+import com.chat.minichat.utils.enums.ChatType;
+import com.chat.minichat.utils.enums.UserStatus;
 import com.chat.minichat.firebaseClient.FirebaseClient;
 import com.chat.minichat.interfaces.Callback;
 import com.chat.minichat.managers.GsonManager;
@@ -24,13 +24,14 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
 
     private String mTarget;
     private String mCurrentUser;
-    private WebRTCClient mWebRTCClient;
-    private GsonManager mGsonManager;
+    private final WebRTCClient mWebRTCClient;
+    private final GsonManager mGsonManager;
 
     private SurfaceViewRenderer mRemoteView;
 
+
     private MainRepository(Context context) {
-        this.mFirebaseClient = new FirebaseClient();
+        this.mFirebaseClient = new FirebaseClient(context);
         mWebRTCClient = WebRTCClient.getInstance(context);
         mGsonManager = GsonManager.getInstance();
     }
@@ -95,6 +96,9 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         this.mTarget = target;
         this.mCurrentUser = current;
     }
+    public void setUser( String current) {
+        this.mCurrentUser = current;
+    }
 
 
     public void initWebRTCClient(String username) {
@@ -154,6 +158,7 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
 
     public void sendEndCall() {
         onTransferEventToSocket(new Chat(mTarget, ChatType.EndCall));
+        clearLatestEvent(mTarget);
     }
 
     public void toggleAudio(Boolean shouldBeMuted) {
@@ -168,12 +173,16 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         mWebRTCClient.switchCamera();
     }
 
-    private void clearLatestEvent(String username) {
+    public void clearLatestEvent(String username) {
         mFirebaseClient.removeLatestEvent(username);
     }
 
     private void updateStatus(String username, UserStatus status) {
         mFirebaseClient.updateMyStatus(username, status);
+    }
+
+    public void createRoom(String username, String secretKey, Callback.ChatConnectionRequestCallback callback){
+        mFirebaseClient.createRoom(username, callback, secretKey);
     }
 
 
@@ -186,8 +195,8 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         });
     }
 
-    public void logOff(Callback.StopServiceCallback stopServiceCallback) {
-        mFirebaseClient.logOff(stopServiceCallback);
+    public void logOff(Runnable runnable) {
+        mFirebaseClient.logOff(runnable, mCurrentUser);
     }
 
     public interface Listener {

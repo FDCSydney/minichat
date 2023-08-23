@@ -1,9 +1,9 @@
 package com.chat.minichat.webrtc;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
-import com.chat.minichat.enums.ChatType;
-import com.chat.minichat.interfaces.Callback;
+import com.chat.minichat.utils.enums.ChatType;
 import com.chat.minichat.managers.GsonManager;
 import com.chat.minichat.models.Chat;
 
@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class WebRTCClient {
+    @SuppressLint("StaticFieldLeak")
     private static WebRTCClient mInstance;
     private final Context mContext;
     private final EglBase.Context eglBaseCtx;
@@ -41,7 +42,6 @@ public class WebRTCClient {
     private final List<PeerConnection.IceServer> mIceServers;
 
     private SurfaceViewRenderer mLocalSurfaceView;
-    private SurfaceViewRenderer mRemoteSurfaceView;
     private MediaStream mLocalStream;
     private AudioTrack mLocalAudioTrack;
     private VideoTrack mLocalVideoTrack;
@@ -155,16 +155,20 @@ public class WebRTCClient {
 
     public void closeConnection() {
         try {
-            mVideoCapturer.dispose();
-            mLocalStream.dispose();
-            mPeerConnection.close();
+            if (mVideoCapturer != null)
+                mVideoCapturer.dispose();
+            if (mLocalStream != null)
+                mLocalStream.dispose();
+            if (mPeerConnection != null)
+                mPeerConnection.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void switchCamera() {
-        mVideoCapturer.switchCamera(null);
+        if(mVideoCapturer != null)
+            mVideoCapturer.switchCamera(null);
     }
 
     public void toggleAudio(Boolean shouldBeMuted) {
@@ -199,7 +203,7 @@ public class WebRTCClient {
 
     // streaming
     private void initSurfaceView(SurfaceViewRenderer renderer) {
-        if(renderer == null) return;
+        if (renderer == null) return;
         renderer.setMirror(false);
         renderer.setEnableHardwareScaler(true);
         renderer.init(eglBaseCtx, null);
@@ -212,7 +216,6 @@ public class WebRTCClient {
     }
 
     public void initRemoteSurfaceView(SurfaceViewRenderer remoteSurfaceView) {
-        this.mRemoteSurfaceView = remoteSurfaceView;
         initSurfaceView(remoteSurfaceView);
     }
 
