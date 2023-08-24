@@ -25,10 +25,10 @@ import com.chat.minichat.service.MainServiceRepository;
 import com.chat.minichat.ui.fragments.CallFragment;
 import com.chat.minichat.utils.enums.ChatType;
 
-import org.jitsi.meet.sdk.JitsiMeet;
-import org.jitsi.meet.sdk.JitsiMeetActivity;
-import org.jitsi.meet.sdk.JitsiMeetActivityDelegate;
-import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+//import org.jitsi.meet.sdk.JitsiMeet;
+//import org.jitsi.meet.sdk.JitsiMeetActivity;
+//import org.jitsi.meet.sdk.JitsiMeetActivityDelegate;
+//import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -232,20 +232,20 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
 
     // connect to room with jitsi
     public void joinRoom(String secretKey) {
-        JitsiMeetConferenceOptions defaultOptions;
-        try {
-            defaultOptions = new JitsiMeetConferenceOptions.Builder()
-                    .setServerURL(new URL("https://meet.jit.si"))
-                    .build();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
-        JitsiMeetConferenceOptions options
-                = new JitsiMeetConferenceOptions.Builder()
-                .setRoom(secretKey)
-                .build();
-        JitsiMeetActivity.launch(this, options);
+//        JitsiMeetConferenceOptions defaultOptions;
+//        try {
+//            defaultOptions = new JitsiMeetConferenceOptions.Builder()
+//                    .setServerURL(new URL("https://meet.jit.si"))
+//                    .build();
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+//        }
+//        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
+//        JitsiMeetConferenceOptions options
+//                = new JitsiMeetConferenceOptions.Builder()
+//                .setRoom(secretKey)
+//                .build();
+//        JitsiMeetActivity.launch(this, options);
 
     }
 

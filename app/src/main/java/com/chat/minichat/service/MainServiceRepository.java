@@ -11,10 +11,13 @@ public class MainServiceRepository {
     }
 
     public void startService(String username) {
-        Intent intent = new Intent(mContext, MainService.class);
-        intent.putExtra("username", username);
-        intent.setAction(MainServiceAction.START_SERVICE.getName());
-        startServiceIntent(intent);
+        new Thread(()->{
+            Intent intent = new Intent(mContext, MainService.class);
+            intent.putExtra("username", username);
+            intent.setAction(MainServiceAction.START_SERVICE.getName());
+            startServiceIntent(intent);
+        }).start();
+
     }
 
     public void startServiceIntent(Intent intent) {
