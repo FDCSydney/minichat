@@ -158,9 +158,16 @@ public class CallFragment extends Fragment implements MainService.CallEndedListe
 
     public interface BackPressListener {
         void onFragmentBackPressed();
+        void onEndCall();
     }
 
     public void setBackPressedListener(BackPressListener listener) {
         mBackPressListener = listener;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mBackPressListener.onEndCall();
     }
 }
