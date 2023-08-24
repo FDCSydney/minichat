@@ -259,6 +259,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         getSupportFragmentManager().beginTransaction().remove(mCallFragment).commit();
         mCallFragment.timerValue = 0;
         mMainServiceRepository.sendEndCall();
+        mBinding.customToolbar.mainToolbar.setVisibility(View.VISIBLE);
     }
 
     @Override
