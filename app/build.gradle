@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -29,6 +30,7 @@ android {
     }
     buildFeatures {
         viewBinding true
+        compose false
     }
 }
 
@@ -44,11 +46,20 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.android.volley:volley:1.2.1'
     implementation platform('com.google.firebase:firebase-bom:32.2.2')
-    implementation ('com.mesibo.api:webrtc:1.0.5')
+//    implementation ('com.mesibo.api:webrtc:1.0.5')
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 //    implementation('org.jitsi.react:jitsi-meet-sdk:8.3.1') {
 //        transitive = true
 //    }
+
+    // skyway
+    implementation files('libs/libwebrtc.aar')
+    implementation files('libs/skyway-core.aar')
+    implementation files('libs/skyway-sfubot.aar')
+    implementation files('libs/skyway-room.aar')
+    // WebSocket
+    implementation "com.squareup.okhttp3:okhttp:4.10.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
 
 }

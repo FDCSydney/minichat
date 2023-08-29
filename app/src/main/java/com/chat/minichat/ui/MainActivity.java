@@ -26,12 +26,6 @@ import com.chat.minichat.ui.fragments.CallFragment;
 import com.chat.minichat.utils.enums.ChatType;
 import com.chat.minichat.utils.enums.UserStatus;
 
-//import org.jitsi.meet.sdk.JitsiMeet;
-//import org.jitsi.meet.sdk.JitsiMeetActivity;
-//import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -254,7 +248,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
 
     }
 
-    private void prepareJitsi(){
+    private void prepareJitsi() {
 //        JitsiMeetConferenceOptions defaultOptions;
 //        try {
 //            defaultOptions = new JitsiMeetConferenceOptions.Builder()
@@ -268,7 +262,6 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
     }
 
 
-
     // connect to room with jitsi
     public void joinRoom(String roomID) {
 //        JitsiMeetConferenceOptions options
@@ -279,6 +272,9 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
 //                .setFeatureFlag("welcomepage.enabled", false)
 //                .build();
 //        JitsiMeetActivity.launch(this, options);
+        Intent intent = new Intent(this, RoomActivity.class);
+        intent.putExtra("roomID", roomID);
+        startActivity(intent);
 
 
     }
