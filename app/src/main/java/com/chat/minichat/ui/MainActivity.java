@@ -2,15 +2,20 @@ package com.chat.minichat.ui;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
@@ -26,9 +31,10 @@ import com.chat.minichat.ui.fragments.CallFragment;
 import com.chat.minichat.utils.enums.ChatType;
 import com.chat.minichat.utils.enums.UserStatus;
 
-//import org.jitsi.meet.sdk.JitsiMeet;
-//import org.jitsi.meet.sdk.JitsiMeetActivity;
-//import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+import org.jitsi.meet.sdk.BroadcastEvent;
+import org.jitsi.meet.sdk.JitsiMeet;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -53,7 +59,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
     private CallFragment mCallFragment;
 
     private MainServiceRepository mMainServiceRepository;
-
+    private BroadcastReceiver mBroadcastReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -73,6 +79,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         mMainServiceRepository = new MainServiceRepository(this);
         prepareRecyclerView();
         prepareJitsi();
+        setUpConferenceCallReceiver();
         username = getIntent().getStringExtra("username");
         if (username == null) finish();
         Glide.with(this)
@@ -112,6 +119,15 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
     private void prepareRecyclerView() {
         mBinding.userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mBinding.userRecyclerView.setHasFixedSize(true);
+    }
+
+    public void setUpConferenceCallReceiver(){
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                onBroadcastReceived(intent);
+            }
+        };
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -255,32 +271,60 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
     }
 
     private void prepareJitsi(){
-//        JitsiMeetConferenceOptions defaultOptions;
-//        try {
-//            defaultOptions = new JitsiMeetConferenceOptions.Builder()
-//                    .setServerURL(new URL("https://meet.jit.si"))
-//                    .setFeatureFlag("welcomepage.enabled", false)
-//                    .build();
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
+        JitsiMeetConferenceOptions defaultOptions;
+        try {
+            defaultOptions = new JitsiMeetConferenceOptions.Builder()
+                    .setServerURL(new URL("https://8x8.vc"))
+                    .setToken("eyJraWQiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzQ2NjBjMjA2YjlhNGUyNDgzYzJmYzBjOTNjOGQ2ZTcvMGY5YTQyLVNBTVBMRV9BUFAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJqaXRzaSIsImlzcyI6ImNoYXQiLCJpYXQiOjE2OTMzMDA0NTgsImV4cCI6MTY5MzMwNzY1OCwibmJmIjoxNjkzMzAwNDUzLCJzdWIiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzQ2NjBjMjA2YjlhNGUyNDgzYzJmYzBjOTNjOGQ2ZTciLCJjb250ZXh0Ijp7ImZlYXR1cmVzIjp7ImxpdmVzdHJlYW1pbmciOnRydWUsIm91dGJvdW5kLWNhbGwiOnRydWUsInNpcC1vdXRib3VuZC1jYWxsIjpmYWxzZSwidHJhbnNjcmlwdGlvbiI6dHJ1ZSwicmVjb3JkaW5nIjp0cnVlfSwidXNlciI6eyJoaWRkZW4tZnJvbS1yZWNvcmRlciI6ZmFsc2UsIm1vZGVyYXRvciI6dHJ1ZSwibmFtZSI6ImZkYy5zeWRuZXliZSIsImlkIjoiZ29vZ2xlLW9hdXRoMnwxMTc1NjA2NjU2MjU3OTIzNDA1MTMiLCJhdmF0YXIiOiIiLCJlbWFpbCI6ImZkYy5zeWRuZXliZUBnbWFpbC5jb20ifX0sInJvb20iOiIqIn0.CFa_UsqBH54polGsLdvAcjQXyK6aF388vO8l-8NsGfc7KmSPuZdIwi2tMEfMxSQcY6RKa23RlFQSvKQNIC3-LuIdTkC_5w2YqWHXuwMho5DyxtEpxyWrjHkJ4NsfUSxLI5jTdZddTcHHb-eam9bq_nSc9bHI8erMDSx_2AxMFlZX-Jt1m5SbabTsDy1ps0Elj8SuRNyha2KPy0RCObVQIuerhvmHqlByEK2mh9R5SOthHZfhfbtH-xQjQLCR-q5F2QQcnMsa6p3LI9SVdCmuehV8C42X9kq2b62nF4ZipN9sZJdG-0jxBPzgDVf6YBNqzqnQgs7MGSUzvx3j6Tm6ew")
+                    .setFeatureFlag("welcomepage.enabled", false)
+                    .build();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
     }
 
 
 
     // connect to room with jitsi
     public void joinRoom(String roomID) {
-//        JitsiMeetConferenceOptions options
-//                = new JitsiMeetConferenceOptions.Builder()
-//                .setRoom(roomID)
-//                .setAudioMuted(true)
-//                .setVideoMuted(true)
-//                .setFeatureFlag("welcomepage.enabled", false)
-//                .build();
-//        JitsiMeetActivity.launch(this, options);
+        String roomName = "vpaas-magic-cookie-74660c206b9a4e2483c2fc0c93c8d6e7/"+roomID ;
+        JitsiMeetConferenceOptions options
+                = new JitsiMeetConferenceOptions.Builder()
+                .setRoom(roomName)
+                .setAudioMuted(true)
+                .setVideoMuted(true)
+                .setFeatureFlag("welcomepage.enabled", false)
+                .build();
+        JitsiMeetActivity.launch(this, options);
+        registerForBroadcastMessages();
+    }
 
+    public void onBroadcastReceived(Intent intent){
+        if(intent == null) return;
+        BroadcastEvent event = new BroadcastEvent(intent);
+        switch (intent.getType()){
+            case "PARTICIPANT_LEFT":
+                Log.d(TAG, "onBroadcastReceived: " + event.getData());
+                break;
+            default:
+                break;
+        }
+    }
+    private void registerForBroadcastMessages() {
+        IntentFilter intentFilter = new IntentFilter();
 
+        /* This registers for every possible event sent from JitsiMeetSDK
+           If only some of the events are needed, the for loop can be replaced
+           with individual statements:
+           ex:  intentFilter.addAction(BroadcastEvent.Type.AUDIO_MUTED_CHANGED.getAction());
+                intentFilter.addAction(BroadcastEvent.Type.CONFERENCE_TERMINATED.getAction());
+                ... other events
+         */
+        for (BroadcastEvent.Type type : BroadcastEvent.Type.values()) {
+            intentFilter.addAction(type.getAction());
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
 
