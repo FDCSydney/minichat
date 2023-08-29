@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.chat.minichat.R;
 import com.chat.minichat.databinding.UserBinding;
 import com.chat.minichat.models.User;
+import com.chat.minichat.utils.enums.UserStatus;
 
 import java.util.List;
 
@@ -98,10 +100,19 @@ public class MainRecyclerViewAdapter extends Adapter {
             }
 
             mUserBinding.aCall.setOnClickListener(view -> {
+                if(user.getStatus().equals(UserStatus.IN_CALL.name()) ||
+                        user.getStatus().equals(UserStatus.OFFLINE.name())){
+                    Toast.makeText(mContext, user.getName() + " is in "+ user.getStatus() +". Please try again later.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 mCallback.onAudioCallClicked(user);
             });
 
             mUserBinding.vCall.setOnClickListener(view -> {
+                if(user.getStatus().equals(UserStatus.IN_CALL.name())){
+                    Toast.makeText(mContext, user.getName() + " is in call. Please try again later.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 mCallback.onVideoCallClicked(user);
             });
             mUserBinding.joinRoom.setOnClickListener(view -> {

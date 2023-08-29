@@ -148,16 +148,23 @@ public class CallFragment extends Fragment implements MainService.CallEndedListe
 
     @Override
     public void onDestroy() {
-        MainService.mLocalView.release();
-        MainService.mLocalView = null;
-        MainService.mRemoteView.release();
-        MainService.mRemoteView = null;
+        if (MainService.mLocalView != null) {
+            MainService.mLocalView.release();
+            MainService.mLocalView = null;
+        }
+        if (MainService.mRemoteView != null) {
+
+            MainService.mRemoteView.release();
+            MainService.mRemoteView = null;
+        }
+        timerValue = 0;
         super.onDestroy();
 
     }
 
     public interface BackPressListener {
         void onFragmentBackPressed();
+
         void onEndCall();
     }
 

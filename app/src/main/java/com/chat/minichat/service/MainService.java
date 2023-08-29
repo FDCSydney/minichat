@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.chat.minichat.R;
-import com.chat.minichat.interfaces.Callback;
 import com.chat.minichat.managers.RTCAudioManager;
 import com.chat.minichat.models.Chat;
 import com.chat.minichat.repository.MainRepository;
@@ -31,7 +30,7 @@ public class MainService extends Service implements MainRepository.Listener {
     public static SurfaceViewRenderer mLocalView;
     public static SurfaceViewRenderer mRemoteView;
 
-    public MainService(){
+    public MainService() {
         mMainRepository = MainRepository.getInstance(this);
 
     }
@@ -44,6 +43,7 @@ public class MainService extends Service implements MainRepository.Listener {
         mRtcAudioManager.setDefaultAudioDevice(RTCAudioManager.AudioDevice.SPEAKER_PHONE);
 
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
@@ -56,6 +56,7 @@ public class MainService extends Service implements MainRepository.Listener {
                     break;
                 case "END_CALL":
                     handleEndCall(intent);
+                    break;
                 case "SWITCH_CAMERA":
                     handleSwitchCamera();
                     break;
@@ -68,9 +69,9 @@ public class MainService extends Service implements MainRepository.Listener {
                 case "TOGGLE_AUDIO_DEVICE":
                     handleToggleAudioDevice(intent);
                     break;
-                    case "STOP_SERVICE":
-                        handleStopService();
-                        break;
+                case "STOP_SERVICE":
+                    handleStopService();
+                    break;
                 default:
                     break;
             }
@@ -190,6 +191,10 @@ public class MainService extends Service implements MainRepository.Listener {
                 if (mCallReceivedListener != null)
                     mCallReceivedListener.onCallReceived(chat);
                 break;
+            case "Declined":
+                if (mCallReceivedListener != null)
+                    mCallReceivedListener.onCallDeclined(chat);
+                break;
             default:
                 break;
         }
@@ -202,6 +207,8 @@ public class MainService extends Service implements MainRepository.Listener {
 
     public interface CallReceivedListener {
         void onCallReceived(Chat chat);
+
+        void onCallDeclined(Chat chat);
     }
 
     public interface CallEndedListener {

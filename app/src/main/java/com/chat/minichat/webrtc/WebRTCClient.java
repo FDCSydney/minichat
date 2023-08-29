@@ -166,6 +166,17 @@ public class WebRTCClient {
         }
     }
 
+    public void callDeclined(){
+        try{
+            if(mVideoCapturer != null){
+                mVideoCapturer.stopCapture();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
     public void switchCamera() {
         if(mVideoCapturer != null)
             mVideoCapturer.switchCamera(null);

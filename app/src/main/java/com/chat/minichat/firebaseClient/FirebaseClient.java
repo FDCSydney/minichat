@@ -60,7 +60,7 @@ public class FirebaseClient {
                                 });
                     } else {
                         // password is wrong, notify user
-                        callback.onComplete(false, "PassWord is Incorrect");
+                        callback.onComplete(false, "Password is incorrect");
                     }
                 } else {
                     // user does not exist register user
@@ -124,7 +124,8 @@ public class FirebaseClient {
                             super.onDataChange(snapshot);
                             Chat chat = null;
                             try {
-                                chat = mGsonManager.getGson().fromJson(Objects.requireNonNull(snapshot.getValue()).toString(), Chat.class);
+                                 if(snapshot.getValue() == null) return;
+                                chat = mGsonManager.getGson().fromJson(snapshot.getValue().toString(), Chat.class);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -184,8 +185,6 @@ public void createRoom(String username, final Callback.ChatConnectionRequestCall
             });
     mRequestManager.getRequestQueue().add(jsonObjectRequest);
 }
-
-
 
     public interface Listener {
         void onLatestEventReceived(Chat chat);

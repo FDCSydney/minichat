@@ -1,6 +1,7 @@
 package com.chat.minichat.ui;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -20,14 +21,13 @@ import com.chat.minichat.models.Chat;
 import com.chat.minichat.models.User;
 import com.chat.minichat.repository.MainRepository;
 import com.chat.minichat.service.MainService;
-import com.chat.minichat.service.MainServiceReceiver;
 import com.chat.minichat.service.MainServiceRepository;
 import com.chat.minichat.ui.fragments.CallFragment;
 import com.chat.minichat.utils.enums.ChatType;
+import com.chat.minichat.utils.enums.UserStatus;
 
 //import org.jitsi.meet.sdk.JitsiMeet;
 //import org.jitsi.meet.sdk.JitsiMeetActivity;
-//import org.jitsi.meet.sdk.JitsiMeetActivityDelegate;
 //import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.MalformedURLException;
@@ -71,8 +71,8 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         mRepository = MainRepository.getInstance(this);
         mCallFragment = new CallFragment();
         mMainServiceRepository = new MainServiceRepository(this);
-        mCallFragment.setBackPressedListener(this);
         prepareRecyclerView();
+        prepareJitsi();
         username = getIntent().getStringExtra("username");
         if (username == null) finish();
         Glide.with(this)
@@ -82,19 +82,28 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
                 .into(mBinding.customToolbar.currentUserPp);
         mBinding.customToolbar.currentUserStatus.setBackgroundColor(Color.parseColor("#00cc00"));
         mBinding.customToolbar.createRoom.setOnClickListener(view -> {
-            String secretKey = System.currentTimeMillis() + username;
-            mRepository.createRoom(username, secretKey, status -> {
+            String roomID = String.valueOf(System.currentTimeMillis());
+            mRepository.createRoom(username, roomID, status -> {
                 if (!status) return;
                 Toast.makeText(this, "Room Created!", Toast.LENGTH_SHORT).show();
                 new Handler().postDelayed(() -> {
-                    joinRoom(secretKey);
-                }, 2000);
+                    joinRoom(roomID);
+                }, 1000);
             });
         });
         mBinding.customToolbar.currentUserPp.setOnClickListener(view -> {
-            Intent intent = new Intent(this, MainServiceReceiver.class);
-            intent.setAction("ACTION_EXIT");
-            this.sendBroadcast(intent);
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirm")
+                    .setMessage("Are you sure to log out?")
+                    .setCancelable(true)
+                    .setPositiveButton("log out", (dialog, i) -> {
+                        dialog.cancel();
+                        mRepository.updateStatus(username, UserStatus.OFFLINE);
+                        finish();
+                    }).setNegativeButton("Cancel", (dialog, i) -> dialog.cancel())
+                    .create()
+                    .show();
+
         });
         subScribeObservers();
         startService();
@@ -189,6 +198,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         }
         // move to call fragment to start call
         if (mSaveInstanceState != null) return;
+        mCallFragment.setBackPressedListener(this);
         mBinding.customToolbar.mainToolbar.setVisibility(View.GONE);
         Bundle bundle = new Bundle();
         bundle.putString("target", name);
@@ -224,31 +234,54 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
             });
             mBinding.declineButton.setOnClickListener(view -> {
                 mBinding.incomingCallLayout.setVisibility(View.GONE);
-                mRepository.clearLatestEvent(username);
+                mRepository.sendConnectionRequest(chat.getTarget(), chat.getSender(), ChatType.Declined, status -> {
+                });
             });
         });
     }
 
+    /**
+     *
+     */
+    @Override
+    public void onCallDeclined(Chat chat) {
+        runOnUiThread(() -> {
+            getSupportFragmentManager().beginTransaction().remove(mCallFragment).commit();
+            mRepository.clearLatestEvent(chat.getSender());
+            mRepository.clearLatestEvent(chat.getTarget());
+            Toast.makeText(this, "Callee Rejected you call", Toast.LENGTH_SHORT).show();
+        });
 
-    // connect to room with jitsi
-    public void joinRoom(String secretKey) {
+    }
+
+    private void prepareJitsi(){
 //        JitsiMeetConferenceOptions defaultOptions;
 //        try {
 //            defaultOptions = new JitsiMeetConferenceOptions.Builder()
 //                    .setServerURL(new URL("https://meet.jit.si"))
+//                    .setFeatureFlag("welcomepage.enabled", false)
 //                    .build();
 //        } catch (MalformedURLException e) {
 //            throw new RuntimeException(e);
 //        }
 //        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
+    }
+
+
+
+    // connect to room with jitsi
+    public void joinRoom(String roomID) {
 //        JitsiMeetConferenceOptions options
 //                = new JitsiMeetConferenceOptions.Builder()
-//                .setRoom(secretKey)
+//                .setRoom(roomID)
+//                .setAudioMuted(true)
+//                .setVideoMuted(true)
+//                .setFeatureFlag("welcomepage.enabled", false)
 //                .build();
 //        JitsiMeetActivity.launch(this, options);
 
-    }
 
+    }
 
 
     /**
@@ -258,7 +291,6 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
     public void onFragmentBackPressed() {
         getSupportFragmentManager().beginTransaction().remove(mCallFragment).commit();
         mBinding.customToolbar.mainToolbar.setVisibility(View.VISIBLE);
-        mCallFragment.timerValue = 0;
         mMainServiceRepository.sendEndCall();
     }
 

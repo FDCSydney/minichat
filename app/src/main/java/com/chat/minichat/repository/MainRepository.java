@@ -77,12 +77,14 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
                 case "EndCall":
                     mListener.onEndCall();
                     break;
+                case "Declined":
+                    mWebRTCClient.callDeclined();
+                    break;
                 default:
                     break;
             }
         });
     }
-
     public void sendConnectionRequest(
             String sender,
             String target,
@@ -137,6 +139,14 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         mWebRTCClient.setSocketTransferListener(this);
 
     }
+    public void sendConnectionRequest(
+            String sender,
+            String target,
+            ChatType type,
+            Callback.SendMessageCallback callback
+    ){
+        mFirebaseClient.sendMessageToOtherClient(new Chat(sender, type, target), callback);
+    }
 
     public void initLocalSurfaceView(SurfaceViewRenderer view, Boolean isVideoCall) {
         mWebRTCClient.initLocalSurfaceView(view, isVideoCall);
@@ -177,9 +187,10 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
         mFirebaseClient.removeLatestEvent(username);
     }
 
-    private void updateStatus(String username, UserStatus status) {
+    public void updateStatus(String username, UserStatus status) {
         mFirebaseClient.updateMyStatus(username, status);
     }
+
 
     public void createRoom(String username, String secretKey, Callback.ChatConnectionRequestCallback callback){
         mFirebaseClient.createRoom(username, callback, secretKey);
