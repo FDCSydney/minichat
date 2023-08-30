@@ -5,19 +5,17 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.chat.minichat.managers.RequestManager;
-import com.chat.minichat.utils.ApiRoutes;
-import com.chat.minichat.utils.enums.UserStatus;
 import com.chat.minichat.interfaces.Callback;
 import com.chat.minichat.managers.FirebaseDbManager;
 import com.chat.minichat.managers.GsonManager;
+import com.chat.minichat.managers.RequestManager;
 import com.chat.minichat.models.Chat;
 import com.chat.minichat.models.User;
+import com.chat.minichat.utils.ApiRoutes;
 import com.chat.minichat.utils.Constants;
 import com.chat.minichat.utils.MyEventListener;
+import com.chat.minichat.utils.enums.UserStatus;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
@@ -124,13 +122,13 @@ public class FirebaseClient {
                             super.onDataChange(snapshot);
                             Chat chat = null;
                             try {
-                                 if(snapshot.getValue() == null) return;
+                                if (snapshot.getValue() == null) return;
                                 chat = mGsonManager.getGson().fromJson(snapshot.getValue().toString(), Chat.class);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             if (chat != null) {
-                                listener.onLatestEventReceived(chat );
+                                listener.onLatestEventReceived(chat);
                             }
                         }
                     });
@@ -157,34 +155,42 @@ public class FirebaseClient {
                 });
     }
 
-//    public void createRoom(String username, Callback.ChatConnectionRequestCallback callback, String secretKey) {
+    //    public void createRoom(String username, Callback.ChatConnectionRequestCallback callback, String secretKey) {
 //        DatabaseReference dbRef = mFirebaseDbManager.getReference();
 //        dbRef.child(username).child(Constants.FirebaseField.ROOM_ID).setValue(secretKey)
 //                .addOnSuccessListener(res->{
 //                    callback.isSuccess(true);
 //                });
 //    }
-public void createRoom(String username, final Callback.ChatConnectionRequestCallback callback, String secretKey) {
-    String url = ApiRoutes.FIREBASE_ROOT_URL + username + ".json";
+    public void createRoom(String username, final Callback.ChatConnectionRequestCallback callback, String secretKey) {
+        String url = ApiRoutes.FIREBASE_ROOT_URL + username + ".json";
 
-    JSONObject roomData = new JSONObject();
-    try {
-        roomData.put(Constants.FirebaseField.ROOM_ID, secretKey);
-    } catch (JSONException e) {
-        e.printStackTrace();
+        JSONObject roomData = new JSONObject();
+        try {
+            roomData.put(Constants.FirebaseField.ROOM_ID, secretKey);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.PATCH, url, roomData,
+                response -> {
+                    callback.isSuccess(true);
+                },
+                error -> {
+                    // Handle error
+                    callback.isSuccess(false);
+                });
+        mRequestManager.getRequestQueue().add(jsonObjectRequest);
     }
 
-    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-            Request.Method.PATCH, url, roomData,
-            response -> {
-                callback.isSuccess(true);
-            },
-            error -> {
-                // Handle error
-                callback.isSuccess(false);
-            });
-    mRequestManager.getRequestQueue().add(jsonObjectRequest);
-}
+    public void removeRoom(String username, Callback.ChatConnectionRequestCallback callback) {
+        DatabaseReference dbRef = mFirebaseDbManager.getReference();
+        dbRef.child(username).child(Constants.FirebaseField.ROOM_ID).setValue(null)
+                .addOnSuccessListener(res -> {
+                    callback.isSuccess(true);
+                });
+    }
 
     public interface Listener {
         void onLatestEventReceived(Chat chat);

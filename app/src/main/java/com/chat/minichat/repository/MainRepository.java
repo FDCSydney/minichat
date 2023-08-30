@@ -195,6 +195,9 @@ public class MainRepository implements WebRTCClient.SocketTransferListener {
     public void createRoom(String username, String secretKey, Callback.ChatConnectionRequestCallback callback){
         mFirebaseClient.createRoom(username, callback, secretKey);
     }
+    public void removeRoom(String username, Callback.ChatConnectionRequestCallback callback){
+        mFirebaseClient.removeRoom(username, callback);
+    }
 
 
     /**
