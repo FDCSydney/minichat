@@ -30,10 +30,10 @@ import com.chat.minichat.ui.fragments.CallFragment;
 import com.chat.minichat.utils.enums.ChatType;
 import com.chat.minichat.utils.enums.UserStatus;
 
-import org.jitsi.meet.sdk.BroadcastEvent;
-import org.jitsi.meet.sdk.JitsiMeet;
-import org.jitsi.meet.sdk.JitsiMeetActivity;
-import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+//import org.jitsi.meet.sdk.BroadcastEvent;
+//import org.jitsi.meet.sdk.JitsiMeet;
+//import org.jitsi.meet.sdk.JitsiMeetActivity;
+//import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -273,51 +273,51 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
     }
 
     private void prepareJitsi() {
-        JitsiMeetConferenceOptions defaultOptions;
-        try {
-            defaultOptions = new JitsiMeetConferenceOptions.Builder()
-                    .setServerURL(new URL("https://8x8.vc"))
-                    .setToken("eyJraWQiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzQ2NjBjMjA2YjlhNGUyNDgzYzJmYzBjOTNjOGQ2ZTcvMGY5YTQyLVNBTVBMRV9BUFAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJqaXRzaSIsImlzcyI6ImNoYXQiLCJpYXQiOjE2OTMzNjQ1MjQsImV4cCI6MTY5MzM3MTcyNCwibmJmIjoxNjkzMzY0NTE5LCJzdWIiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzQ2NjBjMjA2YjlhNGUyNDgzYzJmYzBjOTNjOGQ2ZTciLCJjb250ZXh0Ijp7ImZlYXR1cmVzIjp7ImxpdmVzdHJlYW1pbmciOnRydWUsIm91dGJvdW5kLWNhbGwiOnRydWUsInNpcC1vdXRib3VuZC1jYWxsIjpmYWxzZSwidHJhbnNjcmlwdGlvbiI6dHJ1ZSwicmVjb3JkaW5nIjp0cnVlfSwidXNlciI6eyJoaWRkZW4tZnJvbS1yZWNvcmRlciI6ZmFsc2UsIm1vZGVyYXRvciI6dHJ1ZSwibmFtZSI6ImZkYy5zeWRuZXliZSIsImlkIjoiZ29vZ2xlLW9hdXRoMnwxMTc1NjA2NjU2MjU3OTIzNDA1MTMiLCJhdmF0YXIiOiIiLCJlbWFpbCI6ImZkYy5zeWRuZXliZUBnbWFpbC5jb20ifX0sInJvb20iOiIqIn0.Z-fr2UxBd8Qi6AiS1Z_AOJ68q5DKAIDQvv-jgzwY_MxHWVRvUyZb4kM9mCaLdxnQsKp4peCxAw747-52FKVMjGrSFSUsoP_iF5rGfZYohh9ubXAOua6HjRDMrOTeQEKy4xAhS3Q_A09126lDfOAtWphVn-pSIIFdD1gbbQMZjOtK18sYacmBMP2i_wK92AKi48V9n3vLyLf6-o5PuduYJyrOHIurSHmqDuy28bvcwQY_EDCLR5nta3zf_12ddEVtYrUJ08pXDLcZTT9hGSKkaC_u7DEgGjYfmU14WeJqK3Qo4500AkS5RWEw_x9a8KUSGQ3KBatcpyItEyJDhiT8Tw")
-                    .setFeatureFlag("welcomepage.enabled", false)
-                    .build();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
+//        JitsiMeetConferenceOptions defaultOptions;
+//        try {
+//            defaultOptions = new JitsiMeetConferenceOptions.Builder()
+//                    .setServerURL(new URL("https://8x8.vc"))
+//                    .setToken("eyJraWQiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzQ2NjBjMjA2YjlhNGUyNDgzYzJmYzBjOTNjOGQ2ZTcvMGY5YTQyLVNBTVBMRV9BUFAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJqaXRzaSIsImlzcyI6ImNoYXQiLCJpYXQiOjE2OTMzNjQ1MjQsImV4cCI6MTY5MzM3MTcyNCwibmJmIjoxNjkzMzY0NTE5LCJzdWIiOiJ2cGFhcy1tYWdpYy1jb29raWUtNzQ2NjBjMjA2YjlhNGUyNDgzYzJmYzBjOTNjOGQ2ZTciLCJjb250ZXh0Ijp7ImZlYXR1cmVzIjp7ImxpdmVzdHJlYW1pbmciOnRydWUsIm91dGJvdW5kLWNhbGwiOnRydWUsInNpcC1vdXRib3VuZC1jYWxsIjpmYWxzZSwidHJhbnNjcmlwdGlvbiI6dHJ1ZSwicmVjb3JkaW5nIjp0cnVlfSwidXNlciI6eyJoaWRkZW4tZnJvbS1yZWNvcmRlciI6ZmFsc2UsIm1vZGVyYXRvciI6dHJ1ZSwibmFtZSI6ImZkYy5zeWRuZXliZSIsImlkIjoiZ29vZ2xlLW9hdXRoMnwxMTc1NjA2NjU2MjU3OTIzNDA1MTMiLCJhdmF0YXIiOiIiLCJlbWFpbCI6ImZkYy5zeWRuZXliZUBnbWFpbC5jb20ifX0sInJvb20iOiIqIn0.Z-fr2UxBd8Qi6AiS1Z_AOJ68q5DKAIDQvv-jgzwY_MxHWVRvUyZb4kM9mCaLdxnQsKp4peCxAw747-52FKVMjGrSFSUsoP_iF5rGfZYohh9ubXAOua6HjRDMrOTeQEKy4xAhS3Q_A09126lDfOAtWphVn-pSIIFdD1gbbQMZjOtK18sYacmBMP2i_wK92AKi48V9n3vLyLf6-o5PuduYJyrOHIurSHmqDuy28bvcwQY_EDCLR5nta3zf_12ddEVtYrUJ08pXDLcZTT9hGSKkaC_u7DEgGjYfmU14WeJqK3Qo4500AkS5RWEw_x9a8KUSGQ3KBatcpyItEyJDhiT8Tw")
+//                    .setFeatureFlag("welcomepage.enabled", false)
+//                    .build();
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+//        }
+//        JitsiMeet.setDefaultConferenceOptions(defaultOptions);
     }
 
 
     // connect to room with jitsi
     public void joinRoom(String roomID) {
-        String roomName = "vpaas-magic-cookie-74660c206b9a4e2483c2fc0c93c8d6e7/" + roomID;
-        JitsiMeetConferenceOptions options
-                = new JitsiMeetConferenceOptions.Builder()
-                .setRoom(roomName)
-                .setAudioMuted(true)
-                .setVideoMuted(true)
-                .setFeatureFlag("welcomepage.enabled", false)
-                .build();
-        JitsiMeetActivity.launch(this, options);
-        registerForBroadcastMessages();
+//        String roomName = "vpaas-magic-cookie-74660c206b9a4e2483c2fc0c93c8d6e7/" + roomID;
+//        JitsiMeetConferenceOptions options
+//                = new JitsiMeetConferenceOptions.Builder()
+//                .setRoom(roomName)
+//                .setAudioMuted(true)
+//                .setVideoMuted(true)
+//                .setFeatureFlag("welcomepage.enabled", false)
+//                .build();
+//        JitsiMeetActivity.launch(this, options);
+//        registerForBroadcastMessages();
     }
 
     public void onBroadcastReceived(Intent intent) {
-        if (intent == null) return;
-        BroadcastEvent event = new BroadcastEvent(intent);
-        if ((event.getType() == BroadcastEvent.Type.CONFERENCE_TERMINATED) && isHost) {
-            mRepository.removeRoom(username, status -> {
-            });
-        }
+//        if (intent == null) return;
+//        BroadcastEvent event = new BroadcastEvent(intent);
+//        if ((event.getType() == BroadcastEvent.Type.CONFERENCE_TERMINATED) && isHost) {
+//            mRepository.removeRoom(username, status -> {
+//            });
+//        }
         ;
 
     }
 
     private void registerForBroadcastMessages() {
-        IntentFilter intentFilter = new IntentFilter();
-        for (BroadcastEvent.Type type : BroadcastEvent.Type.values()) {
-            intentFilter.addAction(type.getAction());
-        }
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
+//        IntentFilter intentFilter = new IntentFilter();
+//        for (BroadcastEvent.Type type : BroadcastEvent.Type.values()) {
+//            intentFilter.addAction(type.getAction());
+//        }
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     /**
