@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -61,6 +62,7 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
 
     private MainServiceRepository mMainServiceRepository;
     private BroadcastReceiver mBroadcastReceiver;
+    private Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,17 +77,11 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         init();
     }
 
-    private boolean loopHole() {
-        if (true) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 
     private void init() {
-        loopHole();
-
+        handler.postDelayed(()-> {
+            Log.d(TAG, "init: memoleak");
+        },1000);
         mRepository = MainRepository.getInstance(this);
         mCallFragment = new CallFragment();
         mMainServiceRepository = new MainServiceRepository(this);
@@ -127,9 +123,6 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         });
         subScribeObservers();
         startService();
-        do {
-            Log.d(TAG, "loopHole: testing");
-        } while(true);
     }
 
     private void prepareRecyclerView() {
