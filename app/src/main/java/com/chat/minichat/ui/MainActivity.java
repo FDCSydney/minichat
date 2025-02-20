@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -74,7 +75,17 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         init();
     }
 
+    private boolean loopHole() {
+        if (true) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private void init() {
+        loopHole();
+
         mRepository = MainRepository.getInstance(this);
         mCallFragment = new CallFragment();
         mMainServiceRepository = new MainServiceRepository(this);
@@ -116,6 +127,9 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
         });
         subScribeObservers();
         startService();
+        do {
+            Log.d(TAG, "loopHole: testing");
+        } while(true);
     }
 
     private void prepareRecyclerView() {
