@@ -62,7 +62,6 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
 
     private MainServiceRepository mMainServiceRepository;
     private BroadcastReceiver mBroadcastReceiver;
-    private Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +78,30 @@ public class MainActivity extends BaseActivity implements MainService.CallReceiv
 
 
     private void init() {
-        handler.postDelayed(()-> {
-            Log.d(TAG, "init: memoleak");
-        },1000);
+        int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        // Unnecessarily nested loops
+        for (int i = 0; i < numbers.length; i++) {
+            for (int j = 0; j < 1; j++) {  // This inner loop runs only once, making it redundant
+                System.out.println("Number: " + numbers[i]);
+            }
+        }
+
+        // Inefficient sum calculation
+        int sum = 0;
+        for (int i = 0; i < numbers.length; i++) {
+            sum += numbers[i];
+        }
+        System.out.println("Sum: " + sum);
+
+        // Another unnecessary loop for finding max value
+        int max = numbers[0];
+        for (int i = 1; i < numbers.length; i++) {
+            if (numbers[i] > max) {
+                max = numbers[i];
+            }
+        }
+        System.out.println("Max: " + max);
         mRepository = MainRepository.getInstance(this);
         mCallFragment = new CallFragment();
         mMainServiceRepository = new MainServiceRepository(this);
